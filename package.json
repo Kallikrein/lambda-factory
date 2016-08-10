@@ -1,6 +1,6 @@
 {
   "name": "lambda-factory",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Generates lambda function from config and async/auto object.",
   "main": "index.js",
   "scripts": {
