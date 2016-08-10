@@ -1,5 +1,5 @@
 var assert = require('assert');
-var factory = require('../index');
+var Lambda = require('../index');
 
 function fail (done) {
 	return function (err, value) {
@@ -16,50 +16,51 @@ const event = {
 
 describe('Factory', function () {
 
-	it('returns a function', function (done) {
-		var lambda = factory({});
+	it('returns a factory', function (done) {
+		var factory = new Lambda();
+		var lambda = factory.exec({});
 		lambda(event, null, done);
 	});
 
 	describe('first argument : auto', function () {
 
 		it('fails if a reserved keyword is used (req)', function (done) {
-			var lambda = factory({
-				req: function (auto, cb) {
-					cb(null, 'ok')
+			new Lambda({
+				req: function (event, cb) {
+					cb(null, 'first');
 				}
-			});
-			lambda(event, null, fail(done));
+			}).exec({
+				req: function (auto, cb) {
+					cb(null, 'second')
+				}
+			})(event, null, fail(done));
 		});
 
 		it('fails if a reserved keyword is used (config)', function (done) {
-			var lambda = factory({
+			new Lambda().exec({
 				config: function (auto, cb) {
 					cb(null, 'ok')
 				}
-			});
-			lambda(event, null, fail(done));
+			})(event, null, fail(done));
 		});
 
 		it('should inject in auto', function (done) {
-			var lambda = factory({
+			new Lambda().exec({
 				test: function (auto, cb) {
 					cb(null, 'value');
 				}
-			});
-			lambda(event, null, function (err, auto) {
+			})(event, null, function (err, auto) {
 				assert.strictEqual(auto.test, 'value');
 				done();
 			})
 		});
 
 		it('should trigger callback error', function (done) {
-			var lambda = factory({
+			new Lambda().exec({
 				test: function (auto, cb) {
 					cb(new Error('oups'));
 				}
-			});
-			lambda(event, null, fail(done));
+			})(event, null, fail(done));
 		});
 
 	});
@@ -67,23 +68,20 @@ describe('Factory', function () {
 	describe('second argument : config', function () {
 
 		it('should accept config as null', function (done) {
-			var lambda = factory({});
-			lambda(event, null, done);
+			new Lambda().exec()(event, null, done);
 		});
 
 		it('should accept config as a value', function (done) {
-			var lambda = factory({}, 'test');
-			lambda(event, null, function (err, auto) {
+			new Lambda().exec({}, 'test')(event, null, function (err, auto) {
 				assert.strictEqual(auto.config, 'test');
 				done();
 			});
 		});
 
 		it('should accept config as a function', function (done) {
-			var lambda = factory({}, function (auto, cb) {
+			new Lambda().exec({}, function (auto, cb) {
 				cb(null, 'cool');
-			});
-			lambda(event, null, function (err, auto) {
+			})(event, null, function (err, auto) {
 				assert.strictEqual(auto.config, 'cool');
 				done();
 			});
@@ -94,23 +92,20 @@ describe('Factory', function () {
 	describe('third argument : callback', function () {
 
 		it('should accept callback as null', function (done) {
-			var lambda = factory({});
-			lambda(event, null, done);
+			new Lambda().exec()(event, null, done);
 		});
 
 		it('should accept callback as a value', function (done) {
-			var lambda = factory({}, null, 'value');
-			lambda(event, null, function (err, result) {
+			new Lambda().exec(null, null, 'value')(event, null, function (err, result) {
 				assert.strictEqual(result, 'value');
 				done();
 			});
 		});
 
 		it('should accept callback as a value', function (done) {
-			var lambda = factory({}, null, function (err, auto, cb) {
+			new Lambda().exec(null, null, function (err, auto, cb) {
 				cb(null, 'success');
-			});
-			lambda(event, null, function (err, result) {
+			})(event, null, function (err, result) {
 				assert.strictEqual(result, 'success');
 				done();
 			});
