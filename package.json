@@ -23,7 +23,7 @@
   "homepage": "https://github.com/Kallikrein/lambda-factory#readme",
   "dependencies": {
     "async": "^2.0.1",
-    "lambda-errors": "git+https://github.com/Kallikrein/lambda-errors.git"
+    "lambda-errors": "0.0.1"
   },
   "devDependencies": {
     "mocha": "^3.0.2"
