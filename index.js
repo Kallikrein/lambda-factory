@@ -63,7 +63,8 @@ function Lambda (middlewares) {
 	// CALLBACK
 		const _callback = typeof callback === "function" ? callback : function (err, result, _cb) {
 		// if callback is null, pass the auto handler, else overwrite the handler with a constant
-			_cb(err, callback || result);
+			// callback = (typeof callback === 'undefined') ? result : callback;
+			_cb(err, callback);
 		};
 
 	// AUTO
